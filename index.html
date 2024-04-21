@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Sign App</title>
+   <style>
+       @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+       body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+canvas {
+    border: 1px solid #ccc;
+    display: block;
+    margin: 20px auto;
+             width: 20rem;
+  }
+
+#controls {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+button {
+    margin: 0 10px;
+    background: #5D4BFD;
+    padding: 0.75rem;
+    font-size: large;
+    border-radius: 6px;
+    font-weight: 600;
+    color: white;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+button:hover{
+    margin: 0 10px;
+    background: white;
+    padding: 0.75rem;
+    font-size: large;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #5D4BFD;
+    border: 2px solid #5D4BFD;
+}
+#clearButton{
+  margin: 0 10px;
+    background: white;
+    padding: 0.6rem;
+    font-size: large;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #5D4BFD;
+    border: 2px solid #5D4BFD;
+    transition: all 0.2s ease;
+}
+#clearButton:hover{
+  margin: 0 10px;
+    background: #5D4BFD;
+    padding: 0.6rem;
+    font-size: large;
+    border-radius: 6px;
+    font-weight: 600;
+    color: white;
+    border: 2px solid transparent;
+}
+
+input[type="range"] {
+    width: 100px;
+}
+ header{ 
+position: absolute;
+top: 0rem;
+font-family: "Varela Round", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  background: #5D4BFD;
+  width: 100%;
+  text-align: center;
+  color: white;
+ }
+ input[type="range"] {
+    /* Styles for the range slider */
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    margin: 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    /* Styles for the range thumb in webkit browsers */
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #007bff;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Styles for the range thumb in other browsers */
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #007bff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Additional styles for Firefox */
+input[type="range"]::-moz-range-track {
+    background: #ddd;
+    border-radius: 5px;
+    border: none;
+}
+#widthRange{
+   margin-top: 1rem;
+}
+#colorPicker{
+    border: 0;
+    width: 4rem;
+}
+.Footer{ 
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem ;
+}
+feedback a{ 
+  text-decoration: none;
+  padding: 0.1rem 1rem;
+  border: 2px solid #5D4BFD;
+  font-weight: 500;
+  color: #5D4BFD;
+  border-radius: 5px;
+}
+   </style>
+</head>
+<body>  
+   <header> 
+             <h2> E-Sign App </h2>
+   </header>
+  <div id="controls">
+        <button id="clearButton">Clear</button>
+        <input type="color" id="colorPicker">
+        <input type="range" id="widthRange" min="1" max="10" value="2">
+    </div>
+    <canvas id="signatureCanvas" width="400" height="200"></canvas>
+  
+    <button id="downloadButton">Download Signature</button>
+     <div class="Footer">
+         <footer> Made  with ❤️ by Prakash </footer>
+     <feedback> <a href="https://feedback-kappa-seven.vercel.app/"> Feedback</a> </feedback>
+     </div>
+  
+      
+</body>
+<script type="text/javascript" charset="utf-8">
+ document.addEventListener("DOMContentLoaded", function() {
+    const canvas = document.getElementById('signatureCanvas');
+    const context = canvas.getContext('2d');
+
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    function draw(e) {
+        if (!isDrawing) return;
+        
+        let posX, posY;
+        if (e.type === 'touchmove' || e.type === 'touchstart' || e.type === 'touchend') {
+            posX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+            posY = e.touches[0].clientY - canvas.getBoundingClientRect().top;
+        } else {
+            posX = e.offsetX;
+            posY = e.offsetY;
+        }
+
+        context.strokeStyle = document.getElementById('colorPicker').value;
+        context.lineWidth = document.getElementById('widthRange').value;
+
+        context.beginPath();
+        context.moveTo(lastX, lastY);
+        context.lineTo(posX, posY);
+        context.stroke();
+
+        lastX = posX;
+        lastY = posY;
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        lastX = e.offsetX;
+        lastY = e.offsetY;
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+        isDrawing = true;
+        lastX = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+        lastY = e.touches[0].clientY - canvas.getBoundingClientRect().top;
+    });
+
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchmove', draw);
+
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('touchend', () => isDrawing = false);
+
+    document.getElementById('clearButton').addEventListener('click', () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    document.getElementById('downloadButton').addEventListener('click', () => {
+        const download = document.createElement('a');
+        download.href = canvas.toDataURL("image/png");
+        download.download = 'signature.png';
+        download.click();
+    });
+});
+
+  
+</script>
+</html>
